@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <div id="background"></div>
+
     <input type="file" accept="image/*" id="image-input" />
-    <br />
-    <canvas id="input-canvas" width="256" height="256"></canvas>
-    <canvas id="output-canvas" width="256" height="256"></canvas>
+
+    <div id="canvas-container">
+      <canvas id="input-canvas" width="256" height="256"></canvas>
+      <canvas id="output-canvas" width="256" height="256"></canvas>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script src="image-processing.js"></script>
