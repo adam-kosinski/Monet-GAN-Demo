@@ -2,6 +2,7 @@ const imageInput = document.getElementById("image-input");
 const sliderTarget = document.getElementById("slider-event-target");
 const sliderBar = document.getElementById("slider-bar");
 
+const canvasContainer = document.getElementById("canvas-container");
 const inputCanvas = document.getElementById("input-canvas");
 const outputCanvas = document.getElementById("output-canvas");
 const inputCtx = inputCanvas.getContext("2d");
@@ -20,8 +21,7 @@ loadModel();
 // image handling functions ---------------------
 
 function resetCanvas() {
-  inputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
-  outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+  canvasContainer.style.display = "none";
   sliderBar.style.opacity = 0;
 }
 
@@ -82,6 +82,8 @@ async function convertToMonet() {
   const imgData = outputTensor.toImageData();
   outputCtx.putImageData(imgData, 0, 0);
   sliderBar.style.opacity = 1;
+  setSliderPosition(0);
+  canvasContainer.style.display = "block";
 }
 
 // slider -------------------------------------------------
