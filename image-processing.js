@@ -1,4 +1,6 @@
 const imageInput = document.getElementById("image-input");
+const sliderTarget = document.getElementById("slider-event-target");
+const sliderBar = document.getElementById("slider-bar");
 
 const inputCanvas = document.getElementById("input-canvas");
 const outputCanvas = document.getElementById("output-canvas");
@@ -17,19 +19,32 @@ loadModel();
 
 // image handling functions ---------------------
 
+function resetCanvas() {
+  inputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+  outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+  sliderBar.style.opacity = 0;
+}
+
 imageInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
+
   readImage(file, (src) => {
+    resetCanvas();
+
     const img = new Image();
     img.src = src;
+
     img.onload = async () => {
-      inputCtx.drawImage(img, 0, 0, 256, 256);
-      outputCtx.clearRect(
-        0,
-        0,
-        outputCtx.canvas.width,
-        outputCtx.canvas.height
-      );
+      // center crop a square of the image
+      if (img.width >= img.height) {
+        const dWidth = (256 * img.width) / img.height;
+        const offsetX = -0.5 * (dWidth - 256);
+        inputCtx.drawImage(img, offsetX, 0, dWidth, 256);
+      } else {
+        const dHeight = (256 * img.height) / img.width;
+        const offsetY = -0.5 * (dHeight - 256);
+        inputCtx.drawImage(img, 0, offsetY, 256, dHeight);
+      }
       // wait a moment before running the model so the input image can render
       setTimeout(convertToMonet, 50);
     };
@@ -66,4 +81,24 @@ async function convertToMonet() {
   // display output
   const imgData = outputTensor.toImageData();
   outputCtx.putImageData(imgData, 0, 0);
+  sliderBar.style.opacity = 1;
+}
+
+// slider -------------------------------------------------
+
+sliderTarget.addEventListener("mousemove", (e) => {
+  if (e.buttons === 1) {
+    setSliderPosition(e.clientX);
+  }
+});
+sliderTarget.addEventListener("touchmove", (e) => {
+  e.preventDefault(); // stop mousemove from firing as well
+  setSliderPosition(e.touches[0].clientX);
+});
+
+function setSliderPosition(clientX) {
+  const rect = outputCanvas.getBoundingClientRect();
+  const offsetX = Math.max(0, Math.min(rect.width, clientX - rect.x));
+  sliderBar.style.left = offsetX + "px";
+  outputCanvas.style.clipPath = `inset(0 0 0 ${offsetX}px)`;
 }

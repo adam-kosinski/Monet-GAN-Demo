@@ -26,5 +26,47 @@ html {
 
 #canvas-container canvas {
   position: absolute;
-  border: 1px solid gray;
+  user-select: none;
+}
+
+#slider-event-target {
+  height: 140%;
+  width: 140%;
+  left: -20%;
+  top: -20%;
+  position: absolute;
+  user-select: none;
+}
+
+#slider-bar {
+  height: 100%;
+  width: 2px;
+  background-color: #f5f7f6;
+  position: absolute;
+  transition: opacity 1s;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#slider-handle {
+  width: 15px;
+  height: 40px;
+  border-radius: 7px;
+  background-color: lightgray;
+  border: 2px solid gray;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#slider-handle::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 60%;
+  border-left: 2px solid gray;
+  border-right: 2px solid gray;
 }
