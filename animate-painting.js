@@ -162,9 +162,7 @@ async function animatePainting() {
   // move monet back
   monet.style.transitionDuration = "750ms";
   monet.style.transform = "translate(0, 0)";
+  await new Promise((resolve) =>
+    monet.addEventListener("transitionend", resolve, { once: true })
+  );
 }
-
-inputCtx.fillStyle = "orange";
-inputCtx.fillRect(0, 0, 256, 256);
-outputCtx.fillStyle = "purple";
-outputCtx.fillRect(0, 0, 256, 256);

@@ -21,16 +21,12 @@ loadModel();
 
 // image handling functions ---------------------
 
-function resetCanvas() {
-  // canvasContainer.style.display = "none";
-  sliderBar.style.opacity = 0;
-}
-
 imageInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
 
   readImage(file, (src) => {
-    resetCanvas();
+    inputCanvas.style.opacity = 0;
+    canvasContainer.classList.remove("slider-active");
 
     const img = new Image();
     img.src = src;
@@ -78,15 +74,22 @@ async function convertToMonet() {
   const feeds = { input: inputTensor }; // "input" is the name of the input as specified in the ONNX export
   const t0 = performance.now();
   const results = await session.run(feeds);
-  console.log(performance.now() - t0);
+  console.log(`Model inference took ${Math.round(performance.now() - t0)} ms`);
   const outputTensor = results.output;
 
-  // display output
+  // convert output to image data
+  // make it fully transparent to start so it can be animated in
   const imgData = outputTensor.toImageData();
+
+  // display output
   outputCtx.putImageData(imgData, 0, 0);
-  sliderBar.style.opacity = 1;
+
+  await animatePainting();
+
+  // enable slider functionality
   setSliderPosition(0);
-  canvasContainer.style.display = "block";
+  canvasContainer.classList.add("slider-active");
+  inputCanvas.style.opacity = 1;
 }
 
 // slider -------------------------------------------------

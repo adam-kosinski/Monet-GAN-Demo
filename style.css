@@ -29,6 +29,7 @@ html {
 #canvas-container canvas {
   position: absolute;
   user-select: none;
+  /* transition: opacity 0.5s; */
 }
 
 #slider-event-target {
@@ -39,6 +40,10 @@ html {
   position: absolute;
   user-select: none;
   cursor: w-resize;
+  display: none;
+}
+.slider-active #slider-event-target {
+  display: block;
 }
 
 #slider-bar {
@@ -46,11 +51,14 @@ html {
   width: 2px;
   background-color: #f5f7f6;
   position: absolute;
-  transition: opacity 1s;
+  transition: opacity 0.5s;
   opacity: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.slider-active #slider-bar {
+  opacity: 1;
 }
 
 #slider-handle {
