@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <canvas
+      style="display: none"
+      id="paint-mask"
+      width="256"
+      height="256"
+    ></canvas>
+
     <div id="background"></div>
 
     <input type="file" accept="image/*" id="image-input" />
@@ -20,9 +27,10 @@
       <div id="slider-event-target"></div>
     </div>
 
-    <!-- <img id="monet" src="./assets/monet.jpg" /> -->
+    <img id="monet" src="assets/monet.png" />
 
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script src="image-processing.js"></script>
+    <script src="animate-painting.js"></script>
   </body>
 </html>

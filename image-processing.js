@@ -5,14 +5,15 @@ const sliderBar = document.getElementById("slider-bar");
 const canvasContainer = document.getElementById("canvas-container");
 const inputCanvas = document.getElementById("input-canvas");
 const outputCanvas = document.getElementById("output-canvas");
-const inputCtx = inputCanvas.getContext("2d");
-const outputCtx = outputCanvas.getContext("2d");
+const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
+const outputCtx = outputCanvas.getContext("2d", { willReadFrequently: true });
 
-// load onnx model
+// load onnx model ------------------------------------
 let session;
 async function loadModel() {
   session = await ort.InferenceSession.create("./generator_g.onnx", {
     executionProviders: ["wasm", "webgl"],
+    graphOptimizationLevel: "all",
   });
   console.log("Model is Loaded!");
 }
@@ -21,7 +22,7 @@ loadModel();
 // image handling functions ---------------------
 
 function resetCanvas() {
-  canvasContainer.style.display = "none";
+  // canvasContainer.style.display = "none";
   sliderBar.style.opacity = 0;
 }
 
@@ -75,7 +76,9 @@ async function convertToMonet() {
   );
   const inputTensor = await ort.Tensor.fromImage(inputData);
   const feeds = { input: inputTensor }; // "input" is the name of the input as specified in the ONNX export
+  const t0 = performance.now();
   const results = await session.run(feeds);
+  console.log(performance.now() - t0);
   const outputTensor = results.output;
 
   // display output
