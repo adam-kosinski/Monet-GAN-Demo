@@ -108,17 +108,13 @@ function moveMonet(monetRect, canvasRect, x, y) {
   monet.style.transform = `translate(${offsetX}px, ${offsetY}px) rotateZ(${rotation}deg)`;
 }
 
-async function animatePainting() {
+async function animatePainting(imgData) {
   // setup
   const monet = document.getElementById("monet");
   monet.style.transitionDuration = "750ms";
 
   const monetRect = monet.getBoundingClientRect();
   const canvasRect = outputCanvas.getBoundingClientRect();
-  const contexts = [inputCtx, outputCtx];
-  const imgDatas = contexts.map((ctx) =>
-    ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
-  );
 
   // move monet to canvas, wait until he gets there
   moveMonet(monetRect, canvasRect, PAINT_PATH[0][0], PAINT_PATH[0][1]);
@@ -148,13 +144,11 @@ async function animatePainting() {
     // painting animation ----------------------------------------------
     const mask = getImageDataMask(i);
     // apply alpha mask to each canvas context
-    contexts.forEach((ctx, idx) => {
-      for (let i = 0; i < imgDatas[idx].data.length; i += 4) {
-        imgDatas[idx].data[i + 3] = mask.data[i + 3];
-      }
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.putImageData(imgDatas[idx], 0, 0);
-    });
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      imgData.data[i + 3] = mask.data[i + 3];
+    }
+    outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+    outputCtx.putImageData(imgData, 0, 0);
 
     await sleep(1000 / FPS);
   }

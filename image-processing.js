@@ -19,58 +19,65 @@ async function loadModel() {
 }
 loadModel();
 
-// image handling functions ---------------------
+// image reading  ------------------------------
 
 imageInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-
-  readImage(file, (src) => {
-    inputCanvas.style.opacity = 0;
-    canvasContainer.classList.remove("slider-active");
-
-    const img = new Image();
-    img.src = src;
-
-    img.onload = async () => {
-      // center crop a square of the image
-      if (img.width >= img.height) {
-        const dWidth = (256 * img.width) / img.height;
-        const offsetX = -0.5 * (dWidth - 256);
-        inputCtx.drawImage(img, offsetX, 0, dWidth, 256);
-      } else {
-        const dHeight = (256 * img.height) / img.width;
-        const offsetY = -0.5 * (dHeight - 256);
-        inputCtx.drawImage(img, 0, offsetY, 256, dHeight);
-      }
-      // wait a moment before running the model so the input image can render
-      setTimeout(convertToMonet, 50);
-    };
-  });
-});
-
-function readImage(filename, callback) {
+  const filename = event.target.files[0];
   if (!filename) return;
+
   const reader = new FileReader();
   reader.addEventListener("load", () => {
-    callback(reader.result);
+    runPipeline(reader.result);
   });
   reader.readAsDataURL(filename);
-}
+});
 
 // run AI model ---------------------------------
 
-async function convertToMonet() {
+async function runPipeline(imgSrc) {
   if (session === undefined) {
-    console.warn("Model not loaded yet");
+    alert("Model not loaded yet, please wait a few moments and try again");
     return;
   }
-  const inputData = inputCtx.getImageData(
+
+  // clear canvases
+  inputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+  outputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+  // hide the input canvas for now, so not showing until the painting animation finishes
+  inputCanvas.style.display = "none";
+
+  await sleep(50);
+
+  setSliderPosition(0);
+  canvasContainer.classList.remove("slider-active");
+
+  const img = new Image();
+  img.src = imgSrc;
+
+  // wait for image to load
+  await new Promise((resolve) =>
+    img.addEventListener("load", resolve, { once: true })
+  );
+
+  // get image data from the image, square cropped in the center
+  if (img.width >= img.height) {
+    const dWidth = (256 * img.width) / img.height;
+    const offsetX = -0.5 * (dWidth - 256);
+    inputCtx.drawImage(img, offsetX, 0, dWidth, 256);
+  } else {
+    const dHeight = (256 * img.height) / img.width;
+    const offsetY = -0.5 * (dHeight - 256);
+    inputCtx.drawImage(img, 0, offsetY, 256, dHeight);
+  }
+  const inputImgData = inputCtx.getImageData(
     0,
     0,
     inputCanvas.width,
     inputCanvas.height
   );
-  const inputTensor = await ort.Tensor.fromImage(inputData);
+
+  // run AI model
+  const inputTensor = await ort.Tensor.fromImage(inputImgData);
   const feeds = { input: inputTensor }; // "input" is the name of the input as specified in the ONNX export
   const t0 = performance.now();
   const results = await session.run(feeds);
@@ -79,15 +86,15 @@ async function convertToMonet() {
 
   // convert output to image data
   // make it fully transparent to start so it can be animated in
-  const imgData = outputTensor.toImageData();
+  const outputImgData = outputTensor.toImageData();
 
   // display output
-  outputCtx.putImageData(imgData, 0, 0);
+  await animatePainting(outputImgData);
 
-  await animatePainting();
+  // show the input canvas again
+  inputCanvas.style.display = "block";
 
   // enable slider functionality
-  setSliderPosition(0);
   canvasContainer.classList.add("slider-active");
   inputCanvas.style.opacity = 1;
 }
