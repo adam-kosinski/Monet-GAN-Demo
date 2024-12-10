@@ -49,7 +49,7 @@ async function runPipeline(imgSrc) {
   await sleep(50);
 
   setSliderPosition(0);
-  canvasContainer.classList.remove("slider-active");
+  document.body.classList.remove("slider-active");
 
   const img = new Image();
   img.src = imgSrc;
@@ -95,7 +95,7 @@ async function runPipeline(imgSrc) {
   inputCanvas.style.display = "block";
 
   // enable slider functionality
-  canvasContainer.classList.add("slider-active");
+  document.body.classList.add("slider-active");
   inputCanvas.style.opacity = 1;
 }
 

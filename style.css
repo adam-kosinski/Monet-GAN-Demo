@@ -33,11 +33,13 @@ html {
 }
 
 #slider-event-target {
-  height: 120%;
-  width: 120%;
-  left: -10%;
-  top: -10%;
   position: absolute;
+  inset: 0;
+  margin: auto;
+  height: calc(1.2 * 256px);
+  width: calc(1.2 * 256px);
+  transform: translate(calc(4px), calc(-56px));
+  z-index: 5;
   user-select: none;
   cursor: w-resize;
   display: none;
@@ -86,7 +88,7 @@ html {
   position: absolute;
   width: 300px;
   display: block;
-  right: max(20px, calc(50vw - 500px));
+  right: max(-65px, calc(50vw - 500px));
   bottom: -100px;
   transition: transform 300ms;
 }
