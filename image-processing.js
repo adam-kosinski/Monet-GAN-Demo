@@ -5,8 +5,10 @@ const sliderBar = document.getElementById("slider-bar");
 const canvasContainer = document.getElementById("canvas-container");
 const inputCanvas = document.getElementById("input-canvas");
 const outputCanvas = document.getElementById("output-canvas");
+const thoughtCanvas = document.getElementById("thought-canvas");
 const inputCtx = inputCanvas.getContext("2d", { willReadFrequently: true });
 const outputCtx = outputCanvas.getContext("2d", { willReadFrequently: true });
+const thoughtCtx = thoughtCanvas.getContext("2d");
 
 // load onnx model ------------------------------------
 let session;
@@ -31,6 +33,20 @@ imageInput.addEventListener("change", (event) => {
   });
   reader.readAsDataURL(filename);
 });
+
+function drawSquareCrop(img, ctx) {
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  if (img.width >= img.height) {
+    const dWidth = (w * img.width) / img.height;
+    const offsetX = -0.5 * (dWidth - w);
+    ctx.drawImage(img, offsetX, 0, dWidth, h);
+  } else {
+    const dHeight = (h * img.height) / img.width;
+    const offsetY = -0.5 * (dHeight - h);
+    ctx.drawImage(img, 0, offsetY, w, dHeight);
+  }
+}
 
 // run AI model ---------------------------------
 
@@ -60,21 +76,16 @@ async function runPipeline(imgSrc) {
   );
 
   // get image data from the image, square cropped in the center
-  if (img.width >= img.height) {
-    const dWidth = (256 * img.width) / img.height;
-    const offsetX = -0.5 * (dWidth - 256);
-    inputCtx.drawImage(img, offsetX, 0, dWidth, 256);
-  } else {
-    const dHeight = (256 * img.height) / img.width;
-    const offsetY = -0.5 * (dHeight - 256);
-    inputCtx.drawImage(img, 0, offsetY, 256, dHeight);
-  }
+  drawSquareCrop(img, inputCtx);
   const inputImgData = inputCtx.getImageData(
     0,
     0,
     inputCanvas.width,
     inputCanvas.height
   );
+  // animate thought bubble
+  drawSquareCrop(img, thoughtCtx);
+  await sleep(50);
 
   // run AI model
   const inputTensor = await ort.Tensor.fromImage(inputImgData);

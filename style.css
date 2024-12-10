@@ -92,3 +92,16 @@ html {
   bottom: -100px;
   transition: transform 300ms;
 }
+#monet img {
+  width: 100%;
+}
+#thought-bubble {
+  position: absolute;
+  top: -195px;
+  left: -140px;
+}
+#thought-canvas {
+  position: absolute;
+  top: 45px;
+  left: 91px;
+}
