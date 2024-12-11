@@ -17,6 +17,8 @@ async function loadModel() {
   session = await ort.InferenceSession.create("./generator_g.onnx", {
     executionProviders: ["wasm", "webgl"],
     graphOptimizationLevel: "all",
+  }).catch((err) => {
+    alert("Error!\n" + err);
   });
   console.log("Model is Loaded!");
 }
