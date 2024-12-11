@@ -15,8 +15,7 @@ const thoughtCtx = thoughtCanvas.getContext("2d");
 let session;
 async function loadModel() {
   session = await ort.InferenceSession.create("./generator_g.onnx", {
-    executionProviders: ["wasm", "webgl"],
-    graphOptimizationLevel: "all",
+    executionProviders: ["webgpu", "wasm", "webgl"],
   }).catch((err) => {
     alert("Error!\n" + err);
   });
