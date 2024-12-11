@@ -13,9 +13,23 @@ const thoughtCtx = thoughtCanvas.getContext("2d");
 
 // load onnx model ------------------------------------
 let session;
+
+ort.env.wasm.proxy = true; // use a web worker to preserve UI responsiveness
+
 async function loadModel() {
+  // check for webgpu
+  let executionProviders = ["wasm", "webgl"];
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    const device = await adapter.requestDevice();
+    executionProviders.unshift("webgpu");
+  } catch {
+    console.warn("WebGPU not working");
+  }
+
+  // create session
   session = await ort.InferenceSession.create("./generator_g.onnx", {
-    executionProviders: ["webgpu", "wasm", "webgl"],
+    executionProviders: executionProviders,
   }).catch((err) => {
     alert("Error!\n" + err);
   });
