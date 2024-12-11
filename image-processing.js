@@ -1,6 +1,7 @@
 const imageInput = document.getElementById("image-input");
 const sliderTarget = document.getElementById("slider-event-target");
 const sliderBar = document.getElementById("slider-bar");
+const thoughtBubble = document.getElementById("thought-bubble");
 
 const canvasContainer = document.getElementById("canvas-container");
 const inputCanvas = document.getElementById("input-canvas");
@@ -62,8 +63,6 @@ async function runPipeline(imgSrc) {
   // hide the input canvas for now, so not showing until the painting animation finishes
   inputCanvas.style.display = "none";
 
-  await sleep(50);
-
   setSliderPosition(0);
   document.body.classList.remove("slider-active");
 
@@ -85,7 +84,10 @@ async function runPipeline(imgSrc) {
   );
   // animate thought bubble
   drawSquareCrop(img, thoughtCtx);
-  await sleep(50);
+  thoughtBubble.className = "show";
+  await new Promise((resolve) =>
+    thoughtBubble.addEventListener("animationstart", resolve, { once: true })
+  );
 
   // run AI model
   const inputTensor = await ort.Tensor.fromImage(inputImgData);
@@ -94,6 +96,12 @@ async function runPipeline(imgSrc) {
   const results = await session.run(feeds);
   console.log(`Model inference took ${Math.round(performance.now() - t0)} ms`);
   const outputTensor = results.output;
+
+  // clear the thought bubble, wait for transition to finish
+  thoughtBubble.className = "hide";
+  await new Promise((resolve) =>
+    thoughtBubble.addEventListener("animationend", resolve, { once: true })
+  );
 
   // convert output to image data
   // make it fully transparent to start so it can be animated in

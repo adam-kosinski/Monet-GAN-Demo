@@ -126,9 +126,11 @@ html {
   width: 100%;
 }
 #thought-bubble {
+  opacity: 0;
   position: absolute;
   top: -195px;
   left: -140px;
+  transform-origin: bottom right;
 }
 #thought-bubble img {
   width: 300px;
@@ -137,4 +139,32 @@ html {
   position: absolute;
   top: 45px;
   left: 91px;
+}
+#thought-bubble.show {
+  animation: show-bubble 0.5s forwards;
+}
+#thought-bubble.hide {
+  animation: hide-bubble 0.5s forwards;
+}
+
+@keyframes show-bubble {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes hide-bubble {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
