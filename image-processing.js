@@ -57,14 +57,14 @@ async function runPipeline(imgSrc) {
     return;
   }
 
-  // clear canvases
+  // reset
+  document.getElementById("download").classList.remove("active");
   inputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
   outputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
-  // hide the input canvas for now, so not showing until the painting animation finishes
-  inputCanvas.style.display = "none";
-
   setSliderPosition(0);
   document.body.classList.remove("slider-active");
+  // hide the input canvas for now, so not showing until the painting animation finishes
+  inputCanvas.style.display = "none";
 
   const img = new Image();
   img.src = imgSrc;
@@ -116,6 +116,9 @@ async function runPipeline(imgSrc) {
   // enable slider functionality
   document.body.classList.add("slider-active");
   inputCanvas.style.opacity = 1;
+
+  // enable download
+  document.getElementById("download").classList.add("active");
 }
 
 // slider -------------------------------------------------
@@ -136,3 +139,12 @@ function setSliderPosition(clientX) {
   sliderBar.style.left = offsetX + "px";
   outputCanvas.style.clipPath = `inset(0 0 0 ${offsetX}px)`;
 }
+
+// download --------------------------------------------------
+
+document.getElementById("download").addEventListener("click", () => {
+  const link = document.createElement("a"); // Create a temporary link element
+  link.download = "fake-monet-painting.png";
+  link.href = outputCanvas.toDataURL("image/png");
+  link.click();
+});
