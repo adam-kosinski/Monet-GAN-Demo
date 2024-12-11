@@ -9,7 +9,20 @@
   <body>
     <div id="background"></div>
 
-    <input type="file" accept="image/*" id="image-input" />
+    <input
+      type="file"
+      accept="image/*"
+      id="image-input"
+      style="display: none"
+    />
+    <button
+      id="upload-image-button"
+      tabindex="0"
+      onclick="document.getElementById('image-input').click()"
+    >
+      <div class="plus"><img src="assets/plus.png" /></div>
+      <p>Upload Image</p>
+    </button>
 
     <div id="canvas-container">
       <canvas id="input-canvas" width="256" height="256"></canvas>
